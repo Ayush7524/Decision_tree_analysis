@@ -1,0 +1,165 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
+warnings.filterwarnings("ignore")
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+df = pd.read_excel("bank.xlsx")
+
+df["job"]=df["job"].replace(["management","admin"],"White-collar")
+df["job"]=df["job"].replace(["retires","student","unemployed","unkonwn"],"Others")
+df["job"]=df["job"].replace(["self-employed","enterpreneur"],"self-depend")
+df["deposit"]=np.where(df["deposit"]=="yes",1,0)
+df.loc[df["pdays"]==-1,"pdays"]=999
+df["recent_pdays"]=1/df["pdays"]
+df.drop(columns=["pdays"],inplace=True)
+df.drop(columns=["month","day"],inplace=True)
+df.drop(columns=["contact"],inplace=True)
+
+df1=pd.get_dummies(df,columns=["job","marital","education","default","housing","loan",
+                              "poutcome"],drop_first=True)
+df1
+age	balance	duration	campaign	previous	deposit	recent_pdays	job_White-collar	job_admin.	job_blue-collar	...	marital_single	education_secondary	education_tertiary	education_unknown	default_yes	housing_yes	loan_yes	poutcome_other	poutcome_success	poutcome_unknown
+0	59	2343	1042	1	0	1	0.001001	False	True	False	...	False	True	False	False	False	True	False	False	False	True
+1	56	45	1467	1	0	1	0.001001	False	True	False	...	False	True	False	False	False	False	False	False	False	True
+2	41	1270	1389	1	0	1	0.001001	False	False	False	...	False	True	False	False	False	True	False	False	False	True
+3	55	2476	579	1	0	1	0.001001	False	False	False	...	False	True	False	False	False	True	False	False	False	True
+4	54	184	673	2	0	1	0.001001	False	True	False	...	False	False	True	False	False	False	False	False	False	True
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+11157	33	1	257	1	0	0	0.001001	False	False	True	...	True	False	False	False	False	True	False	False	False	True
+11158	39	733	83	4	0	0	0.001001	False	False	False	...	False	True	False	False	False	False	False	False	False	True
+11159	32	29	156	2	0	0	0.001001	False	False	False	...	True	True	False	False	False	False	False	False	False	True
+11160	43	0	9	2	5	0	0.005814	False	False	False	...	False	True	False	False	False	False	True	False	False	False
+11161	34	0	628	1	0	0	0.001001	False	False	False	...	False	True	False	False	False	False	False	False	False	True
+11162 rows × 28 columns
+
+y=df1["deposit"]
+X=df1.drop(columns="deposit")
+
+X_train , X_test,y_train,y_test = train_test_split(X,y,test_size=.2,random_state=88)
+
+#DecisionTreeClassifier(*, criterion='gini', 
+                          # max_depth=None,
+                         #  min_samples_split=2, 
+                          # min_samples_leaf=1,
+                          # random_state=None)
+
+# help(DecisionTreeClassifier())
+​
+
+# df.drop(columns=["pdays"],inplace=True)
+# df.drop(columns=["month","day"],inplace=True)
+# df.drop(columns=["contact"],inplace=True)
+
+y=df1["deposit"]
+X=df1.drop(columns="deposit")
+X_train , X_test,y_train,y_test = train_test_split(X,y,test_size=.2,random_state=88)
+
+df1=pd.get_dummies(df,columns=["job","marital","education","default","housing","loan",
+                              "poutcome"],drop_first=True)
+df1
+age	balance	duration	campaign	previous	deposit	recent_pdays	job_White-collar	job_admin.	job_blue-collar	...	marital_single	education_secondary	education_tertiary	education_unknown	default_yes	housing_yes	loan_yes	poutcome_other	poutcome_success	poutcome_unknown
+0	59	2343	1042	1	0	1	0.001001	False	True	False	...	False	True	False	False	False	True	False	False	False	True
+1	56	45	1467	1	0	1	0.001001	False	True	False	...	False	True	False	False	False	False	False	False	False	True
+2	41	1270	1389	1	0	1	0.001001	False	False	False	...	False	True	False	False	False	True	False	False	False	True
+3	55	2476	579	1	0	1	0.001001	False	False	False	...	False	True	False	False	False	True	False	False	False	True
+4	54	184	673	2	0	1	0.001001	False	True	False	...	False	False	True	False	False	False	False	False	False	True
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+11157	33	1	257	1	0	0	0.001001	False	False	True	...	True	False	False	False	False	True	False	False	False	True
+11158	39	733	83	4	0	0	0.001001	False	False	False	...	False	True	False	False	False	False	False	False	False	True
+11159	32	29	156	2	0	0	0.001001	False	False	False	...	True	True	False	False	False	False	False	False	False	True
+11160	43	0	9	2	5	0	0.005814	False	False	False	...	False	True	False	False	False	False	True	False	False	False
+11161	34	0	628	1	0	0	0.001001	False	False	False	...	False	True	False	False	False	False	False	False	False	True
+11162 rows × 28 columns
+
+dt= DecisionTreeClassifier(random_state=88)
+
+dt.fit(X_train,y_train)
+DecisionTreeClassifier(random_state=88)
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook.
+On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.
+
+print("Train accuracy",dt.score(X_train,y_train))
+print("Test accuracy",dt.score(X_test,y_test))
+Train accuracy 1.0
+Test accuracy 0.7272727272727273
+
+print("Train accuracy",dt.score(X_train,y_train))
+print("Test accuracy",dt.score(X_test,y_test))
+Train accuracy 1.0
+Test accuracy 0.7272727272727273
+
+dt = DecisionTreeClassifier(max_depth=10,min_samples_leaf=5,
+                            min_samples_split=3,
+                            random_state=88)
+
+dt.fit(X_train,y_train)
+DecisionTreeClassifier(max_depth=10, min_samples_leaf=5, min_samples_split=3,
+                       random_state=88)
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook.
+On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.
+
+print("Train accuracy",dt.score(X_train,y_train))
+print("Test accuracy",dt.score(X_test,y_test))
+Train accuracy 0.8386157464441707
+Test accuracy 0.8034034930586654
+
+print("Train accuracy",dt.score(X_train,y_train))
+print("Test accuracy",dt.score(X_test,y_test))
+Train accuracy 0.8386157464441707
+Test accuracy 0.8034034930586654
+
+X_train
+age	balance	duration	campaign	previous	recent_pdays	job_White-collar	job_admin.	job_blue-collar	job_entrepreneur	...	marital_single	education_secondary	education_tertiary	education_unknown	default_yes	housing_yes	loan_yes	poutcome_other	poutcome_success	poutcome_unknown
+4921	36	0	687	7	0	0.001001	False	False	False	False	...	False	True	False	False	True	False	True	False	False	True
+1698	35	518	616	1	0	0.001001	False	False	False	False	...	False	True	False	False	False	True	False	False	False	True
+9975	42	1468	136	1	0	0.001001	False	False	True	False	...	False	True	False	False	False	True	False	False	False	True
+7681	30	1	63	9	0	0.001001	False	False	True	False	...	False	False	False	False	False	True	False	False	False	True
+3897	63	0	253	5	0	0.001001	False	True	False	False	...	False	True	False	False	False	True	False	False	False	True
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+8554	38	668	238	1	0	0.001001	False	False	True	False	...	False	False	False	False	False	False	False	False	False	True
+2481	26	96	349	1	3	0.014286	False	True	False	False	...	True	True	False	False	False	False	False	False	False	False
+4047	27	643	301	1	1	0.010753	False	False	False	False	...	True	True	False	False	False	False	False	False	True	False
+6432	31	91	206	1	0	0.001001	False	False	False	False	...	True	False	True	False	False	False	False	False	False	True
+10200	39	1654	264	6	0	0.001001	False	False	False	False	...	False	True	False	False	False	False	False	False	False	True
+8929 rows × 27 columns
+
+X_
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+
+log =LogisticRegression()
+rm =RandomForestClassifier()
+dt =DecisionTreeClassifier()
+
+log.fit(X_train,y_train)
+dt.fit(X_train,y_train)
+rm.fit(X_train,y_train)
+​
+RandomForestClassifier()
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook.
+On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.
+
+print("logistic Regression Accuracy")
+print("train accuracy",log.score(X_train,y_train))
+print("train accuracy",log.score(X_test,y_test))
+logistic Regression Accuracy
+train accuracy 0.782954418187927
+train accuracy 0.8051948051948052
+
+dt.fit(X_train,y_train)
+rm.fit(X_train,y_train)
+RandomForestClassifier()
+In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook.
+On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.
+
+print("Random Forest Accuracy")
+print("train accuracy",rm.score(X_train,y_train))
+print("train accuracy",rm.score(X_test,y_test))
+Random Forest Accuracy
+train accuracy 1.0
+train accuracy 0.8307210031347962
